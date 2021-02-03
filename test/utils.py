@@ -1,26 +1,16 @@
-import matplotlib.pyplot as plt
+import random
 import re
-import requests
+import string
 import subprocess
 from http import HTTPStatus
 
-from config import (
-    C, N,
-    LOGGER,
-    rq_range, concurency_range,
-    reqs,
-    rq_per_s,
-    time_per_rq, time_per_rq_c,
-    transfer_rate,
-    connect_time,
-    processing_time, waiting_time,
-    failed_rq,
-    AUTH_URL,
-    payload_admin_account
-)
+import matplotlib.pyplot as plt
+import requests
+from config import (AUTH_URL, LOGGER, C, N, concurency_range, connect_time,
+                    failed_rq, payload_admin_account, processing_time, reqs,
+                    rq_per_s, rq_range, time_per_rq, time_per_rq_c,
+                    transfer_rate, waiting_time)
 
-import random
-import string
 
 def get_random_string(length):
     letters = string.ascii_lowercase
