@@ -19,7 +19,7 @@ if not (ADMIN_PASSWORD := os.getenv('ADMIN_PASSWORD')):
 if not (ADMIN_USERNAME := os.getenv('ADMIN_USERNAME')):
     sys.exit('The admin username must be provided '
              'through the "ADMIN_USERNAME" environment variable!')
-    
+
 CLIENT_PASSWORD = os.getenv('CLIENT_PASSWORD')
 CLIENT_USERNAME = os.getenv('CLIENT_USERNAME')
 
@@ -28,17 +28,20 @@ HEALTH = os.getenv('HEALTH')
 AUTH = os.getenv('AUTH')
 USER_LOGIN = os.getenv('USER_LOGIN')
 GET_USERS = os.getenv('GET_USERS')
+GET_USER = os.getenv('GET_USER')
 ADD_USER = os.getenv('ADD_USER')
 DELETE_USER = os.getenv('DELETE_USER')
 UPDATE_USER = os.getenv('UPDATE_USER')
 
 GET_DEVICES = os.getenv('GET_DEVICES')
+GET_DEVICE = os.getenv('GET_DEVICE')
 ADD_DEVICE = os.getenv('ADD_DEVICE')
 DELETE_DEVICE = os.getenv('DELETE_DEVICE')
 UPDATE_DEVICE = os.getenv('UPDATE_DEVICE')
 GET_USER_DEVICES = os.getenv('GET_USER_DEVICES')
 
 GET_SENSORS = os.getenv('GET_SENSORS')
+GET_SENSOR = os.getenv('GET_SENSOR')
 ADD_SENSORS = os.getenv('ADD_SENSORS')
 DELETE_SENSORS = os.getenv('DELETE_SENSORS')
 UPDATE_SENSORS = os.getenv('UPDATE_SENSORS')
@@ -54,7 +57,8 @@ GET_FILTERED_SENSOR_DATA = os.getenv('GET_FILTERED_SENSOR_DATA')
 # verbose settings
 VERBOSE = int(os.getenv('VERBOSE'))
 
-# default Flask port, on this port all microservices will be exposed internally.
+# default Flask port, on this port all microservices
+# will be exposed internally.
 EXPOSED_PORT = int(os.getenv('EXPOSED_PORT'))
 
 HEALTH_URL = f"http://{HOST}:{EXPOSED_PORT}/{HEALTH}"
@@ -62,17 +66,20 @@ HEALTH_URL = f"http://{HOST}:{EXPOSED_PORT}/{HEALTH}"
 AUTH_URL = f"http://{HOST}:{EXPOSED_PORT}/{AUTH}"
 USER_LOGIN_URL = f"http://{HOST}:{EXPOSED_PORT}/{USER_LOGIN}"
 GET_USERS_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_USERS}"
+GET_USER_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_USER}"
 ADD_USER_URL = f"http://{HOST}:{EXPOSED_PORT}/{ADD_USER}"
 DELETE_USER_URL = f"http://{HOST}:{EXPOSED_PORT}/{DELETE_USER}"
 UPDATE_USER_URL = f"http://{HOST}:{EXPOSED_PORT}/{UPDATE_USER}"
 
 GET_DEVICES_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_DEVICES}"
+GET_DEVICE_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_DEVICE}"
 ADD_DEVICE_URL = f"http://{HOST}:{EXPOSED_PORT}/{ADD_DEVICE}"
 DELETE_DEVICE_URL = f"http://{HOST}:{EXPOSED_PORT}/{DELETE_DEVICE}"
 UPDATE_DEVICE_URL = f"http://{HOST}:{EXPOSED_PORT}/{UPDATE_DEVICE}"
 GET_USER_DEVICES_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_USER_DEVICES}"
 
 GET_SENSORS_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_SENSORS}"
+GET_SENSOR_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_SENSOR}"
 ADD_SENSORS_URL = f"http://{HOST}:{EXPOSED_PORT}/{ADD_SENSORS}"
 DELETE_SENSORS_URL = f"http://{HOST}:{EXPOSED_PORT}/{DELETE_SENSORS}"
 UPDATE_SENSORS_URL = f"http://{HOST}:{EXPOSED_PORT}/{UPDATE_SENSORS}"
@@ -88,6 +95,13 @@ GET_FILTERED_SENSOR_DATA_URL = f"http://{HOST}:{EXPOSED_PORT}/{GET_FILTERED_SENS
 
 payload_admin_account = str({'username': ADMIN_USERNAME, 'password': ADMIN_PASSWORD}).replace("\'", "\"")
 payload_client_account = str({'username': CLIENT_USERNAME, 'password': CLIENT_PASSWORD}).replace("\'", "\"")
+
+
+# Configure Logging
+# LoggingConfig.disable_default_loggers()
+# LoggingConfig.configure_app_logger()
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
 
 C = 5

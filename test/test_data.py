@@ -1,8 +1,6 @@
 import pytest
-from utils import SharedValues
-from utils import template_get, template_post
+from utils import template_get, template_post, HTTPClient
 from config import (
-    payload_client_account,
     GET_DATA_URL,
     ADD_DATA_URL,
     GET_SENSOR_DATA_URL,
@@ -28,26 +26,29 @@ def run_before_tests():
 
 
 def test_get_data():
-    json_path = str('test/helper_jsons/admin_credentials.json')
-    template_post(GET_DATA_URL,
-                  'get_data',
-                  json_path=json_path)
+    template_get(GET_DATA_URL,
+                 'get_data',
+                 access_token=HTTPClient.admin_access_token)
+
+    assert True
+
+
+def test_get_sensor_data():
+    template_get(GET_SENSOR_DATA_URL.format(USER_ID=HTTPClient.global_id,
+                                            DEVICE_ID=HTTPClient.global_device_id,
+                                            SENSOR_ID=HTTPClient.global_sensor_id),
+                 'get_sensor_data',
+                 access_token=HTTPClient.global_access_token)
 
     assert True
 
 
 def test_add_data():
     json_path = str('test/helper_jsons/new_data.json')
-    template_post(ADD_DATA_URL,
+    template_post(ADD_DATA_URL.format(USER_ID=HTTPClient.global_id,
+                                      DEVICE_ID=HTTPClient.global_device_id,
+                                      SENSOR_ID=HTTPClient.global_sensor_id),
                   'add_data',
                   json_path=json_path)
-
-    assert True
-
-
-def test_get_sensor_data():
-    template_get(GET_SENSOR_DATA_URL.replace("{ID}", "2"),
-                 'get_sensor_data',
-                 SharedValues.access_token)
 
     assert True

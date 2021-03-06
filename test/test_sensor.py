@@ -1,11 +1,10 @@
 import pytest
-from utils import SharedValues
-from utils import template_get, template_post
+from utils import template_get, template_post, HTTPClient
 from config import (
-    payload_client_account,
     GET_SENSORS_URL,
     ADD_SENSORS_URL,
     GET_USER_SENSORS_URL,
+    GET_SENSOR_URL,
     GET_DEVICE_SENSORS_URL,
     rq_per_s, time_per_rq, time_per_rq_c,
     transfer_rate,
@@ -29,34 +28,45 @@ def run_before_tests():
 
 
 def test_get_sensors():
-    json_path = str('test/helper_jsons/admin_credentials.json')
-    template_post(GET_SENSORS_URL,
-                  'get_sensors',
-                  json_path=json_path)
+    template_get(GET_SENSORS_URL,
+                 'get_sensors',
+                 access_token=HTTPClient.admin_access_token)
+
+    assert True
+
+
+def test_get_sensor():
+    template_get(GET_SENSOR_URL.format(USER_ID=HTTPClient.global_id,
+                                       DEVICE_ID=HTTPClient.global_device_id,
+                                       ID=HTTPClient.global_sensor_id),
+                 'get_sensor',
+                 access_token=HTTPClient.global_access_token)
+
+    assert True
+
+
+def test_get_user_sensors():
+    template_get(GET_USER_SENSORS_URL.format(USER_ID=HTTPClient.global_id),
+                 'get_user_sensors',
+                 access_token=HTTPClient.global_access_token)
+
+    assert True
+
+
+def test_get_device_sensors():
+    template_get(GET_DEVICE_SENSORS_URL.format(USER_ID=HTTPClient.global_id,
+                                               DEVICE_ID=HTTPClient.global_device_id),
+                 'get_device_sensors',
+                 access_token=HTTPClient.global_access_token)
 
     assert True
 
 
 def test_add_sensor():
     json_path = str('test/helper_jsons/new_sensor.json')
-    template_post(ADD_SENSORS_URL,
+    template_post(ADD_SENSORS_URL.format(USER_ID=HTTPClient.global_id,
+                                         DEVICE_ID=HTTPClient.global_device_id),
                   'add_sensor',
                   json_path=json_path)
-
-    assert True
-
-
-def test_get_user_sensors():
-    template_get(GET_USER_SENSORS_URL.replace("{ID}", "2"),
-                 'get_user_sensors',
-                 SharedValues.access_token)
-    
-    assert True
-
-
-def test_get_device_sensors():
-    template_get(GET_DEVICE_SENSORS_URL.replace("{ID}", "2"),
-                 'get_device_sensors',
-                 SharedValues.access_token)
 
     assert True
