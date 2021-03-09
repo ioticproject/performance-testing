@@ -31,7 +31,7 @@ def add_objects_for_tests():
         exit("[ERROR] Could not add user for testing.")
     HTTPClient.global_username = response.json()["username"]
     HTTPClient.global_password = response.json()["password"]
-    HTTPClient.global_id = response.json()["id"]
+    HTTPClient.global_id = response.json()["_id"]
     HTTPClient.global_email = HTTPClient.global_username + "@test.com"
     LOGGER.info("Added user for testing.")
 
@@ -51,7 +51,7 @@ def add_objects_for_tests():
                                 data=new_device_payload)
     if response.status_code != HTTPStatus.CREATED:
         exit("[ERROR] Could not add device for testing." + response.text)
-    HTTPClient.global_device_id = response.json()["id"]
+    HTTPClient.global_device_id = response.json()["_id"]
     LOGGER.info("Added device for testing.")
 
     # Add global sensor for the data tests
@@ -68,7 +68,7 @@ def add_objects_for_tests():
                                 data=new_sensor_payload)
     if response.status_code != HTTPStatus.CREATED:
         exit("[ERROR] Could not add sensor for testing. " + response.text)
-    HTTPClient.global_sensor_id = response.json()["id"]
+    HTTPClient.global_sensor_id = response.json()["_id"]
     LOGGER.info("Added sensor for testing.")
 
 

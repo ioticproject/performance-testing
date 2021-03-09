@@ -264,8 +264,6 @@ def template_post(url, plot_title, json_path=None, access_token=None):
                                   json_path=json_path,
                                   content_type=content_type,
                                   access_token=access_token)
-        # print("OOOOOOOOOOOOOOOOOOOOOooooooooooooooOOOOOOOOOOOOOOOOOOOOOOoooooooooooooooooooooo")
-        # print(cmd)
         res = subprocess.check_output(cmd, shell=False)
         parse_result(res)
 
