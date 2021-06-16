@@ -29,10 +29,10 @@ def add_objects_for_tests():
                                 data=new_user_payload)
     if response.status_code != HTTPStatus.CREATED:
         exit("[ERROR] Could not add user for testing.")
+
     HTTPClient.global_username = response.json()["username"]
     HTTPClient.global_password = response.json()["password"]
     HTTPClient.global_id = response.json()["_id"]
-    HTTPClient.global_email = HTTPClient.global_username + "@test.com"
     LOGGER.info("Added user for testing.")
 
     # Generate access token
@@ -52,10 +52,14 @@ def add_objects_for_tests():
     if response.status_code != HTTPStatus.CREATED:
         exit("[ERROR] Could not add device for testing." + response.text)
     HTTPClient.global_device_id = response.json()["_id"]
+    HTTPClient.global_apiKey = response.json()["apiKey"]
+    LOGGER.info("Device ApiKey: " + HTTPClient.global_apiKey)
     LOGGER.info("Added device for testing.")
 
     # Add global sensor for the data tests
-    new_sensor_payload = str({"type": "TEST-" + random_str,
+    new_sensor_payload = str({"name": "TEST-" + random_str,
+                              "dataType": "int",
+                              "type": "TEST-" + random_str,
                               "measure_unit": "Celssius",
                               "id_user": HTTPClient.global_id,
                               "id_device": HTTPClient.global_device_id
@@ -67,9 +71,21 @@ def add_objects_for_tests():
                                 headers=headers,
                                 data=new_sensor_payload)
     if response.status_code != HTTPStatus.CREATED:
+        LOGGER.error(response.json())
         exit("[ERROR] Could not add sensor for testing. " + response.text)
     HTTPClient.global_sensor_id = response.json()["_id"]
     LOGGER.info("Added sensor for testing.")
+
+    # Associate sensors
+    url = "http://" + os.getenv('HOST') + ":" + os.getenv('EXPOSED_PORT') + "/iot/devices"
+
+    payload="{\"name\": \"TEST_PUB_SUB\"}"
+    headers = {
+        'apiKey': HTTPClient.global_apiKey,
+        'Content-Type': 'application/json'
+    }
+
+    requests.request("POST", url, headers=headers, data=payload)
 
 
 def generate_payload_files():
@@ -77,45 +93,39 @@ def generate_payload_files():
         f.write(payload_admin_account)
 
     with open("test/helper_jsons/user_credentials.json", 'w') as f:
-        payload_client_account = str({"username": HTTPClient.global_username,
-                                      "password": HTTPClient.global_password,
-                                      "email": HTTPClient.global_email
-                                      }).replace("\'", "\"")
         f.write(payload_client_account)
 
-    with open("test/helper_jsons/new_user.json", 'w') as f:
+    with open("test/helper_jsons/new_user_credentials.json", 'w') as f:
         random_str = Utils.get_random_string(16)
-        new_user_payload = str({"username": "TEST-" + random_str,
-                                "password": "!!" + random_str,
-                                "email": random_str + "@test.com"
-                                }).replace("\'", "\"")
+        new_user_payload = str({ "username": "TEST-" + random_str,
+                    "password": "!!" + random_str,
+                    "email": random_str + "@test.com"
+                }).replace("\'", "\"")
         f.write(new_user_payload)
 
     with open("test/helper_jsons/new_device.json", 'w') as f:
         random_str = "TEST-" + Utils.get_random_string(16)
-        new_user_payload = str({"name": random_str,
-                                "id_user": HTTPClient.global_id,
+        new_user_payload = str({ "name": random_str,
+                                "id_user": 2,
                                 "description": random_str}
                                ).replace("\'", "\"")
         f.write(new_user_payload)
 
-    with open("test/helper_jsons/device_put.json", 'w') as f:
-        random_str = "TEST-" + Utils.get_random_string(16)
-        device_payload_put = str({"name": random_str}).replace("\'", "\"")
-        f.write(device_payload_put)
-
     with open("test/helper_jsons/new_sensor.json", 'w') as f:
-        new_sensor_payload = str({ "type": "temperature",
-                                  "measure_unit": "celssius"}).replace("\'", "\"")
-        f.write(new_sensor_payload)
-
-    with open("test/helper_jsons/sensor_put.json", 'w') as f:
-        sensor_payload_put = str({ "measure_unit": "farenheit"}).replace("\'", "\"")
-        f.write(sensor_payload_put)
+        random_str = "TEST-" + Utils.get_random_string(16)
+        new_user_payload = str({"name": "TEST-" + random_str,
+                                "dataType": "int",
+                                "type": "temperature",
+                                "measure_unit": "celssius",
+                                "id_user": 4,
+                                "id_device": 4}).replace("\'", "\"")
+        f.write(new_user_payload)
 
     with open("test/helper_jsons/new_data.json", 'w') as f:
-        new_data_payload = str({"value": 2000}).replace("\'", "\"")
-        f.write(new_data_payload)
+        new_user_payload = str({"id_sensor": 2,
+                                "value": 2000}
+                               ).replace("\'", "\"")
+        f.write(new_user_payload)
 
 
 def remove_dir_content(folder):
@@ -132,12 +142,12 @@ def remove_dir_content(folder):
 
 # RUN BEFORE ALL TESTS
 def pytest_sessionstart(session):
-    add_objects_for_tests()
     generate_payload_files()
+    add_objects_for_tests()
 
 
 def pytest_sessionfinish(session):
-    # remove_dir_content("test/helper_jsons")
+    remove_dir_content("test/helper_jsons")
 
     headers = {
         'Authorization': HTTPClient.global_access_token

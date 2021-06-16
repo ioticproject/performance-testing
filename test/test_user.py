@@ -64,7 +64,7 @@ def test_get_user():
 
 
 def test_add_user():
-    json_path = str('test/helper_jsons/new_user.json')
+    json_path = str('test/helper_jsons/new_user_credentials.json')
     template_post(ADD_USER_URL,
                   'add_user',
                   json_path=json_path,

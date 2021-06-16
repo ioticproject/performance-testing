@@ -19,6 +19,7 @@ from config import (AUTH_URL, LOGGER, payload_admin_account,
                     processing_time, waiting_time, failed_rq)
 
 
+
 class HTTPClient:
     access_token = None
     global_access_token = None
@@ -61,6 +62,85 @@ class HTTPClient:
 
         HTTPClient.admin_access_token = "jwt " + response.json()['access_token']
         LOGGER.info('Got the ADMIN access token: ' + HTTPClient.admin_access_token)
+
+
+    def template_get(url, headers, payload, need_access_token=False):
+        response = requests.request("GET", url, headers=headers, data=payload)
+        # print("**********************************************************")
+        # print(response.text)
+        assert (
+            response.status_code == HTTPStatus.OK
+            or response.status_code == HTTPStatus.CREATED
+        )
+        ret = response
+
+        if need_access_token:
+            del headers["Authorization"]
+            response = requests.request("GET",
+                                        url=url,
+                                        headers=headers,
+                                        data=payload)
+            assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+            headers["Authorization"] = Utils.get_random_token()
+            response = requests.request("GET",
+                                        url=url,
+                                        headers=headers,
+                                        data=payload)
+            assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+        return ret
+
+
+    def template_get_bad_request(url, headers, payload):
+        response = requests.request("GET", url, headers=headers, data=payload)
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+
+        return response
+
+
+    def template_post(url, headers, payload, need_access_token=False):
+        response = requests.request("POST", url, headers=headers, data=payload)
+        # print("**********************************************************")
+        # print(response.text)
+        assert (
+            response.status_code == HTTPStatus.OK
+            or response.status_code == HTTPStatus.CREATED
+        )
+        ret = response
+
+        if need_access_token:
+            del headers["Authorization"]
+            response = requests.request("POST",
+                                        url=url,
+                                        headers=headers,
+                                        data=payload)
+
+            assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+            headers["Authorization"] = Utils.get_random_token()
+            response = requests.request("POST",
+                                        url=url,
+                                        headers=headers,
+                                        data=payload)
+
+            assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+        return ret
+
+
+    def template_post_bad_request(url, headers, payload):
+        response = requests.request("POST", url, headers=headers, data=payload)
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+
+        return response
+
+
+    def template_post_unauthorized(url, headers, payload):
+        response = requests.request("POST", url, headers=headers, data=payload)
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+        return response
 
 
 class Utils:
@@ -149,6 +229,8 @@ def draw_plot(plot_title):
     plt.plot(reqs, transfer_rate, label="Transfer Rate [Kbytes/sec]")
     plt.xlabel('Time [s]')
     plt.ylabel('Transfer Rate [Kbytes/sec]')
+
+    plt.tight_layout()
 
     plt.savefig('graphics/' + plot_title)
 
